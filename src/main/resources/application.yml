@@ -1,0 +1,64 @@
+zeebe:
+  client:
+    gateway:
+      address: localhost:26500
+    security:
+      plaintext: true
+
+camunda.bpm:
+  admin-user:
+    id: demo
+    password: demo
+    firstName: Demo
+  filter:
+    create: All tasks
+
+camunda:
+  tasklist:
+    # Elasticsearch (ELS) configuration for Tasklist
+    elasticsearch:
+      clusterName: elasticsearch         # Elasticsearch Cluster Name
+      url: http://elasticsearch:9200     # URL of Elasticsearch REST API
+      prefix: zeebe-record
+      ssl:
+        selfSigned: false               # If using self-signed certificates
+        verifyHostname: false            # Disable hostname verification
+    # Zeebe connection
+    zeebe:
+      gatewayAddress: zeebe:26500        # Address of Zeebe Gateway
+    # Zeebe Elasticsearch exporter configuration
+    zeebeElasticsearch:
+      clusterName: elasticsearch         # Elasticsearch Cluster Name
+      url: http://elasticsearch:9200     # URL of Elasticsearch REST API
+      prefix: zeebe-record               # Index prefix, configured in Zeebe Elasticsearch exporter
+      ssl:
+        selfSigned: false                 # If using self-signed certificates
+        verifyHostname: false            # Disable hostname verification
+
+  operate:
+    # Elasticsearch (ELS) configuration for Operate
+    elasticsearch:
+      url: http://elasticsearch:9200     # URL of Elasticsearch REST API
+    # Zeebe connection
+    zeebe:
+      gateway-address: zeebe:26500       # Address of Zeebe Gateway
+
+server:
+  servlet:
+    context-path: /tasklist              # Optional: Customize context path for Tasklist
+
+management:
+  health:
+    defaults:
+      enabled: false                     # Disable default health indicators
+    probes:
+      enabled: true                      # Enable Kubernetes health groups
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus      # Enable health check and metrics endpoints
+      cors:
+        allowed-origins: "*"
+        allowed-methods: "*"
+
+

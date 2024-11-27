@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_03ym7eb" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.29.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="Decision_0hpubdk" name="Abrechnung bearbeiten">
+    <decisionTable id="DecisionTable_0u8ury6">
+      <input id="Input_1" biodi:width="192">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>Rechnung</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_15fuoyx">
+          <text>"Ja","Nein"</text>
+        </inputValues>
+      </input>
+      <output id="Output_1" name="Valid" typeRef="string">
+        <outputValues id="UnaryTests_11c8jq2">
+          <text>"Rechnung gedruckt an Finanabteilung senden","Zurück an Antragsteller senden"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_1wtn947">
+        <description></description>
+        <inputEntry id="UnaryTests_0gh2gyc">
+          <text>"Ja"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0utgek8">
+          <text>"Rechnung gedruckt an Finanabteilung senden"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0zit5iz">
+        <description></description>
+        <inputEntry id="UnaryTests_11lvzlj">
+          <text>"Nein"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0h2y8j0">
+          <text>"Zurück an Antragsteller senden"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_0hpubdk">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_0wzscno" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.29.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <decision id="Decision_1f3phbv" name="Prüfung des Antrag">
+    <decisionTable id="DecisionTable_16gdk79">
+      <input id="Input_1" label="Status" biodi:width="192">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>Prüfung</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0v452ei">
+          <text>"Aktzeptiert","Abgelehnt"</text>
+        </inputValues>
+      </input>
+      <output id="Output_1" name="Geschäftsreise" typeRef="string">
+        <outputValues id="UnaryTests_08cpcqf">
+          <text>"Geschäftsreise aktzeptiert","Geschäftsreise abgelehnt"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_1ehlfkq">
+        <inputEntry id="UnaryTests_05pvgxo">
+          <text>"Aktzeptiert"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0fit649">
+          <text>"Geschäftsreise aktzeptiert"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1g6tjef">
+        <inputEntry id="UnaryTests_0yrfi0m">
+          <text>Abgelehnt</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0khyrqm">
+          <text>"Geschäftsreise abgelehnt"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_1f3phbv">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
