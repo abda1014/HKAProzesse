@@ -27,17 +27,17 @@ public class AbrechnungswesenWorker {
 
         // 1. Prozessvariablen abrufen
         Map<String, Object> variables = job.getVariablesAsMap();
-        String entscheidung = (String) variables.get("entscheidung");
-        String rechnungInhalt = (String) variables.get("rechnungInhalt");
+        Boolean entscheidung = (Boolean) variables.get("isProcess");
+        String rechnungInhalt = (String) variables.get("invoice"); //muss der key hier rein ?
         String employeeNumber = (String) variables.get("employeeNumber");
 
         logger.info("Empfangene Daten: Entscheidung={}, RechnungInhalt={}, EmployeeNumber={}", entscheidung, rechnungInhalt, employeeNumber);
 
         // 2. Entscheidung verarbeiten
-        if ("ja".equalsIgnoreCase(entscheidung)) {
+        if (Boolean.TRUE.equals(entscheidung)) {
             // Rechnung an die Finanzabteilung weiterleiten
             String messageName = "RechnungFinanzabteilung";
-            sendMessageService.sendMessage(messageName, employeeNumber, rechnungInhalt);
+            sendMessageService.sendMessage(messageName, employeeNumber, String.valueOf(rechnungInhalt));
             logger.info("Rechnung an Finanzabteilung weitergeleitet.");
         } else {
             // Nachricht an den Antragsteller senden
