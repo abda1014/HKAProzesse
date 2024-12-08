@@ -27,12 +27,14 @@ public class AntragstellerWorker {
 
         // 1. Formulardaten aus Prozessvariablen abrufen
         Map<String, Object> variables = job.getVariablesAsMap();
-        String name = variables.get("name").toString(); // String
-        String department = variables.get("department").toString(); // String
-        String position = variables.get("position").toString(); // String
-        String employeeNumber = variables.get("employeeNumber").toString(); // String
-        String purposeOfTrip = variables.get("purposeOfTrip").toString(); // String
-        Double estimatedCost = Double.valueOf(variables.get("estimatedCost").toString());
+
+        // Variablen mit Prüfung auf Existenz und Inhalt
+        String name = getVariable(variables, "name", client, job);
+        String department = getVariable(variables, "department", client, job);
+        String position = getVariable(variables, "position", client, job);
+        String employeeNumber = getVariable(variables, "employeeNumber", client, job);
+        String purposeOfTrip = getVariable(variables, "purposeOfTrip", client, job);
+        Double estimatedCost = getDoubleVariable(variables, "estimatedCost", client, job);
 
         logger.info("Formulardaten: Name={}, Department={}, Position={}, EmployeeNumber={}, PurposeOfTrip={}, EstimatedCost={}",
                 name, department, position, employeeNumber, purposeOfTrip, estimatedCost);
@@ -59,31 +61,18 @@ public class AntragstellerWorker {
         // 1. Rechnungsdaten aus Prozessvariablen abrufen
         Map<String, Object> variables = job.getVariablesAsMap();
 
-        // Zugriff auf die Rechnungsdaten aus dem Formularfeld mit dem Key 'textfield_gna92o'
-        Double gesamtRechnung = null;
-        if (variables.containsKey("textfield_gna92o")) {
-            gesamtRechnung = Double.valueOf(variables.get("textfield_gna92o").toString());
-        } else {
-            logger.error("Fehler: 'textfield_gna92o' wurde nicht in den Prozessvariablen gefunden!");
-            client.newFailCommand(job.getKey())
-                    .retries(job.getRetries() - 1)
-                    .errorMessage("Missing form variable 'textfield_gna92o'")
-                    .send()
-                    .join();
-            return;
-        }
-
-        // Zusätzliche Prozessvariable z.B. Employee Number
-        String employeeNumber = (String) variables.get("employeeNumber");
+        Double gesamtRechnung = getDoubleVariable(variables, "invoice", client, job); //ursprünglich amount !
+        String employeeNumber = getVariable(variables, "employeeNumber", client, job);
 
         logger.info("Rechnungsdaten: GesamtRechnung={}, EmployeeNumber={}", gesamtRechnung, employeeNumber);
 
         // 2. Nachricht an das Abrechnungswesen senden
         String correlationKey = employeeNumber; // Eindeutiger Schlüssel
         String messageName = "RechnungWeiterleiten"; // Nachrichtentyp
+        String formData = variables.toString();
 
         // Nachricht mit den Daten senden
-        String formData = String.format("{\"gesamtRechnung\": %f, \"employeeNumber\": \"%s\"}", gesamtRechnung, employeeNumber);
+//        String formData = String.format("{\"gesamtRechnung\": %f, \"employeeNumber\": \"%s\"}", gesamtRechnung, employeeNumber);
         sendMessageService.sendMessage(messageName, correlationKey, formData);
 
         logger.info("Nachricht an das Abrechnungswesen gesendet: MessageName={}, CorrelationKey={}", messageName, correlationKey);
@@ -94,4 +83,42 @@ public class AntragstellerWorker {
         logger.info("Ende: Rechnung erfolgreich weitergeleitet.");
     }
 
+    // Hilfsmethoden für die Prüfung von Variablen
+    private String getVariable(Map<String, Object> variables, String key, JobClient client, ActivatedJob job) {
+        if (variables.containsKey(key) && variables.get(key) != null) {
+            return variables.get(key).toString();
+        } else {
+            logger.error("Fehler: '{}' wurde nicht in den Prozessvariablen gefunden!", key);
+            client.newFailCommand(job.getKey())
+                    .retries(job.getRetries() - 1)
+                    .errorMessage("Missing process variable: " + key)
+                    .send()
+                    .join();
+            throw new IllegalStateException("Prozessvariable fehlt: " + key);
+        }
+    }
+
+    private Double getDoubleVariable(Map<String, Object> variables, String key, JobClient client, ActivatedJob job) {
+        if (variables.containsKey(key) && variables.get(key) != null) {
+            try {
+                return Double.valueOf(variables.get(key).toString());
+            } catch (NumberFormatException e) {
+                logger.error("Fehler: '{}' ist keine gültige Zahl!", key);
+                client.newFailCommand(job.getKey())
+                        .retries(job.getRetries() - 1)
+                        .errorMessage("Invalid number format for variable: " + key)
+                        .send()
+                        .join();
+                throw new IllegalStateException("Ungültiges Zahlenformat für Variable: " + key);
+            }
+        } else {
+            logger.error("Fehler: '{}' wurde nicht in den Prozessvariablen gefunden!", key);
+            client.newFailCommand(job.getKey())
+                    .retries(job.getRetries() - 1)
+                    .errorMessage("Missing process variable: " + key)
+                    .send()
+                    .join();
+            throw new IllegalStateException("Prozessvariable fehlt: " + key);
+        }
+    }
 }

@@ -21,31 +21,43 @@ public class VerantwortlicherWorker {
         this.sendMessageService = sendMessageService;
     }
 
-    @JobWorker(type = "antrag-pruefen")
-    public void handleAntragPruefen(final JobClient client, final ActivatedJob job) {
-        logger.info("Start: Antrag prüfen");
+    @JobWorker(type = "antrag-benachrichtigen")
+    public void handleAntragBenachrichtigung(final JobClient client, final ActivatedJob job) {
+        logger.info("Start: Antragsteller benachrichtigen");
 
-        // Prozessvariablen abrufen
-        Map<String, Object> variables = job.getVariablesAsMap();
-        String decisionResult = (String) variables.get("decisionResult"); // Ergebnis der DMN-Tabelle
-        String employeeNumber = (String) variables.get("employeeNumber"); // Korrelationsschlüssel
-        String formData = variables.toString(); // Alle Variablen als JSON-String
+        try {
+            // Prozessvariablen abrufen
+            Map<String, Object> variables = job.getVariablesAsMap();
+            logger.info("Prozessvariablen: {}", variables);
 
-        logger.info("DMN-Entscheidung: {}, EmployeeNumber: {}", decisionResult, employeeNumber);
+            // DMN-Result aus Prozessvariablen abrufen
+            Boolean decisionResult = (Boolean) variables.get("eligibleTravel"); // Genehmigt oder Abgelehnt
+            String employeeNumber = (String) variables.get("employeeNumber"); // Korrelationsschlüssel
 
-        // Entscheidung basierend auf dem DMN-Result
-        if ("Akzeptiert".equalsIgnoreCase(decisionResult)) {
-            logger.info("Antrag akzeptiert. Nachricht an Antragsteller wird gesendet...");
-            sendMessageService.sendMessage("AntragGenehmigt", employeeNumber, formData);
-        } else if ("Abgelehnt".equalsIgnoreCase(decisionResult)) {
-            logger.info("Antrag abgelehnt. Nachricht an Antragsteller wird gesendet...");
-            sendMessageService.sendMessage("AntragAbgelehnt", employeeNumber, formData);
-        } else {
-            logger.warn("Unbekannte Entscheidung: {}", decisionResult);
+            logger.info("Entscheidung aus DMN: {}, EmployeeNumber: {}", decisionResult, employeeNumber);
+
+            // Nachricht basierend auf Entscheidung senden
+            if (Boolean.TRUE.equals(decisionResult)) {
+                logger.info("Antrag genehmigt. Nachricht wird gesendet...");
+                sendMessageService.sendMessage("AntragGenehmigt", employeeNumber, "Ihr Antrag wurde genehmigt.");
+                logger.info("Nachricht 'AntragGenehmigt' wurde erfolgreich gesendet.");
+            } else if (Boolean.FALSE.equals(decisionResult)) {
+                logger.info("Antrag abgelehnt. Nachricht wird gesendet...");
+                sendMessageService.sendMessage("AntragAbgelehnt", employeeNumber, "Ihr Antrag wurde abgelehnt.");
+                logger.info("Nachricht 'AntragAbgelehnt' wurde erfolgreich gesendet.");
+            } else {
+                logger.warn("Unbekannte Entscheidung: {}", decisionResult);
+                sendMessageService.sendMessage("UnbekannteEntscheidung", employeeNumber, "Es gab ein Problem bei der Verarbeitung Ihres Antrags.");
+                logger.info("Nachricht 'UnbekannteEntscheidung' wurde gesendet.");
+            }
+
+            // Job abschließen
+            client.newCompleteCommand(job.getKey()).variables(variables).send().join();
+            logger.info("Ende: Antragsteller benachrichtigt.");
+
+        } catch (Exception e) {
+            logger.error("Fehler bei der Verarbeitung des Jobs: {}", e.getMessage(), e);
+            throw e; // Fehler weiterwerfen, damit er im Prozess sichtbar wird
         }
-
-        // Job abschließen
-        client.newCompleteCommand(job.getKey()).send().join();
-        logger.info("Ende: Antrag geprüft und Entscheidung weitergeleitet.");
     }
 }
