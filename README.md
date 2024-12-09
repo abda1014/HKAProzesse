@@ -1,32 +1,28 @@
 # HKAProzesse
 
-Das Projekt HKAProzesse implementiert einen Dienstreiseantragsprozess mithilfe von Camunda Cloud. Der Workflow ermöglicht die Verwaltung und Verfolgung von Dienstreiseanträgen, Rechnungsprüfungen und Finanzabwicklungen. Die Cluster-Informationen sind im Main-Code hinterlegt, und die gesamte Prozessausführung kann über das Camunda Operate-Tool überwacht werden.
+Das Projekt **HKAProzesse** implementiert einen Dienstreiseantragsprozess mithilfe von Camunda Cloud. Der Workflow ermöglicht die Verwaltung und Verfolgung von Dienstreiseanträgen, Rechnungsprüfungen und Finanzabwicklungen. Die Cluster-Informationen sind im Main-Code hinterlegt, und die gesamte Prozessausführung kann über das Camunda Operate-Tool überwacht werden.
 
-Voraussetzungen
-Software
-Camunda Modeler:
-Um den Workflow zu erstellen, zu bearbeiten und zu deployen, muss ein Login in den Camunda Modeler erforderlich sein.
-Camunda Operate:
-Für die Überwachung des Prozesses.
-Java Development Kit (JDK): Version 21 
-Maven: Zum Bauen und Ausführen des Projekts.
-Zugangsdaten
-Camunda Cloud Cluster Informationen:
-Die Cluster-Details (Cluster-ID, Client-ID, und Client-Secret) müssen im main()-Methodenblock des Codes und in der application.yml korrekt eingetragen sein.
+## Voraussetzungen
 
+### Software
+- **Camunda Modeler**:  
+  Um den Workflow zu erstellen, zu bearbeiten und zu deployen, ist ein Login im Camunda Modeler erforderlich.
+- **Camunda Operate**:  
+  Für die Überwachung und Nachverfolgung des Prozesses.
+- **Java Development Kit (JDK)**: Version 21  
+  Für die Ausführung des Codes.
+- **Maven**:  
+  Zum Bauen und Ausführen des Projekts.
 
-Schritte zur Ausführung
-Projektverzeichnis aufrufen: Navigieren Sie in das Verzeichnis, in dem sich das Projekt befindet. In diesem Fall:
+### Zugangsdaten
+- **Camunda Cloud Cluster Informationen**:  
+  Die Cluster-Details (`Cluster-ID`, `Client-ID`, und `Client-Secret`) müssen in der `main()`-Methode und in der `application.yml` hinterlegt sein.
 
-bash
-Code kopieren
-cd hkaprozesse
-Spring Boot Anwendung starten: Starten Sie das Projekt mit Maven:
+## Schritte zur Ausführung
 
-bash
-Code kopieren
-mvn spring-boot:run
-Prozess-ID im Log überprüfen:
+1. **Projektverzeichnis aufrufen**  
+   Navigieren Sie in das Verzeichnis, in dem sich das Projekt befindet. In diesem Fall:
 
-Die Prozessinstanznummer wird im Log ausgegeben.
-Diese kann verwendet werden, um die spezifische Prozessausführung im Camunda Operate nachzuverfolgen.
+   ```bash
+   cd hkaprozesse
+   mvn spring-boot:run
