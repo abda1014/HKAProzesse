@@ -1,0 +1,73 @@
+#beispiel mail server von google
+SPRING_MAIL_USERNAME: calebgyamfi15@gmail.com
+SPRING_MAIL_PASSWORD: qgmwtxmxpbinaewv
+
+
+spring:
+  application:
+    name: camunda_prozess
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  file.name: ./tmp/application.log
+  logback.rollingpolicy:
+    file-name-pattern: ${logging.file.name}.%d{yyyy-MM-dd}.%i.gz
+    max-file-size: 100KB
+    max-history: 3
+  pattern:
+    # %thread protokolliert den Thread-Namen: leer bei Virtual Threads
+    # https://stackoverflow.com/questions/61207226/logging-thread-id-instead-of-thread-name-using-logback
+    console: "%clr(%date{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(%5level) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %msg%n%wEx"
+    file: "%date{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5level ${PID:- } --- [%thread] %-40.40logger{39} : %m%n%wEx"
+  threshold:
+    console: trace
+    file: trace
+  level:
+    de.hka.camunda_prozess: trace
+    org.apache.catalina.authenticator.AuthenticatorBase: debug
+    org.apache.catalina.loader.WebappClassLoaderBase: info
+    org.springframework.boot.availability.ApplicationAvailabilityBean: debug
+    org.springframework.boot.devtools.autoconfigure.ConditionEvaluationDeltaLoggingListener: warn
+    # PersistenceUnit "default" fuer Jakarta Persistence
+    #org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean: debug
+    org.springframework.security.core.userdetails.User: error
+    org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider: debug
+    org.springframework.security.web.access.intercept.RequestMatcherDelegatingAuthorizationManager: debug
+    org.springframework.security.web.server.authorization.AuthorizationWebFilter: trace
+    org.springframework.security.web.FilterChainProxy: debug
+    #org.springframework.security.web.FilterChainProxy: trace
+    org.springframework.web.client.RestTemplate: debug
+    org.springframework.web.reactive.function.client.ExchangeFunctions: trace
+    org.springframework.web.service.invoker.PathVariableArgumentResolver: trace
+    org.springframework.web.service.invoker.RequestHeaderArgumentResolver: trace
+    org.springframework.web.servlet.DispatcherServlet: debug
+    org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor: debug
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: debug
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: error
+    io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor: error
+
+    # https://thorben-janssen.com/hibernate-logging-guide
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: debug
+    #org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.SQL_SLOW: warn
+    org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor: debug
+
+    io.qameta.allure.AllureLifecycle: fatal
+    org.junit.jupiter.engine.descriptor.TestInstanceLifecycleUtils: warn
+    org.springframework.boot.test.context.SpringBootTestContextBootstrapper: warn
+    org.springframework.test.context.support.AbstractContextLoader: warn
+    org.springframework.test.context.support.AnnotationConfigContextLoaderUtils: warn
+    org.springframework.test.context.support.DefaultTestContextBootstrapper: warn
