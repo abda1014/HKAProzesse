@@ -1,5 +1,6 @@
 package com.acme.hkaprozesse;
 
+import com.acme.hkaprozesse.service.EmailSenderService;
 import com.acme.hkaprozesse.service.SendMessageService;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.camunda.zeebe.client.api.worker.JobClient;
@@ -15,10 +16,12 @@ public class AbrechnungswesenWorker {
 
     private static final Logger logger = LogManager.getLogger(AbrechnungswesenWorker.class);
 
-    private final SendMessageService sendMessageService;
+//    private final SendMessageService sendMessageService;
+    private final EmailSenderService emailSenderService;
 
-    public AbrechnungswesenWorker(SendMessageService sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    public AbrechnungswesenWorker(SendMessageService sendMessageService, EmailSenderService emailSenderService) {
+//        this.sendMessageService = sendMessageService;
+        this.emailSenderService = emailSenderService;
     }
 
     @JobWorker(type = "rechnung-ueberpruefen")
@@ -37,12 +40,27 @@ public class AbrechnungswesenWorker {
         if (Boolean.TRUE.equals(entscheidung)) {
             // Rechnung an die Finanzabteilung weiterleiten
             String messageName = "RechnungFinanzabteilung";
-            sendMessageService.sendMessage(messageName, employeeNumber, String.valueOf(rechnungInhalt));
+//          sendMessageService.sendMessage(messageName, employeeNumber, String.valueOf(rechnungInhalt));
+            emailSenderService.sendEmailAndPublishMessage(
+                    "scdo0008@gmail.com",
+                    "Dienstreiseantrag von "+employeeNumber,
+                    "Der Betrag "+ rechnungInhalt + " € soll an "+employeeNumber+" überwiesen werden.",
+                    messageName,
+                    employeeNumber
+            );
+
             logger.info("Rechnung an Finanzabteilung weitergeleitet.");
         } else {
             // Nachricht an den Antragsteller senden
             String messageName = "RechnungKorrektur";
-            sendMessageService.sendMessage(messageName, employeeNumber, "Bitte überprüfen Sie die Rechnung.");
+//            sendMessageService.sendMessage(messageName, employeeNumber, "Bitte überprüfen Sie die Rechnung.");
+            emailSenderService.sendEmailAndPublishMessage(
+                    employeeNumber+"@gmail.com",
+                    "Korrektur der Rechnung",
+                    "Überprüfen Sie bitte nochmal die Rechnung.",
+                    messageName,
+                    employeeNumber
+            );
             logger.info("Nachricht an Antragsteller gesendet, Rechnung überprüfen.");
         }
 
@@ -71,7 +89,7 @@ public class AbrechnungswesenWorker {
         String messageName = "AntragstellerInformieren"; // Nachrichtentyp
         String messageData = "{\"status\": \"" + status + "\", \"betrag\": \"" + betrag + "\"}";
 
-        sendMessageService.sendMessage(messageName, correlationKey, messageData);
+//        sendMessageService.sendMessage(messageName, correlationKey, messageData);
 
         logger.info("Antragsteller informiert: MessageName={}, CorrelationKey={}", messageName, correlationKey);
 
