@@ -9,3 +9,30 @@ camunda:
     zeebe:
       defaults:
         stream-enabled: false
+  operate:
+    base-url: https://https://bru-2.operate.camunda.io/83d96c80-028e-41e3-9005-8029fc1fc274/operate              # URL für Camunda Operate
+    auth:
+      client-id: 80iA1_8DDNEd0LVwLf5hwOu7GPmFcM8Z                # Client ID für Operate
+      client-secret: UFtlmvCfk21A_OO6C0VlZOyuMVElWvH-hVFgxnnJ4z95cXgfBIhQTMAUbEjy0kFk
+
+#logging:
+#  level:
+#    io.camunda.zeebe: DEBUG
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: davidabraaaham123@gmail.com
+    password: shde huwa wsll govx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+#logging:
+  #level:
+    #io.camunda.zeebe: DEBUG
+    #org.springframework.mail: DEBUG

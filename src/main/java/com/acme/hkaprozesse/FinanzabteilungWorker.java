@@ -1,5 +1,6 @@
 package com.acme.hkaprozesse;
 
+import com.acme.hkaprozesse.service.EmailSenderService;
 import com.acme.hkaprozesse.service.SendMessageService;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.camunda.zeebe.client.api.worker.JobClient;
@@ -15,9 +16,11 @@ public class FinanzabteilungWorker {
 
     private static final Logger logger = LogManager.getLogger(FinanzabteilungWorker.class);
     private final SendMessageService sendMessageService;
+    private final EmailSenderService emailSenderService;
 
-    public FinanzabteilungWorker(SendMessageService sendMessageService) {
+    public FinanzabteilungWorker(SendMessageService sendMessageService,EmailSenderService emailSenderService) {
         this.sendMessageService = sendMessageService;
+        this.emailSenderService = emailSenderService;
     }
 
     @JobWorker(type = "ueberweisungdurchfuehren")
@@ -37,12 +40,19 @@ public class FinanzabteilungWorker {
                 rechnungsbetrag);
 
         // 3. Bestätigung an das Abrechnungswesen senden
-        String correlationKey = (String) variables.get("employeeNumber"); // Eindeutiger Schlüssel
+        String employeeNumber = (String) variables.get("employeeNumber"); // Eindeutiger Schlüssel
         String messageName = "UeberweisungBestaetigung"; // Nachrichtentyp
         String confirmationData = variables.toString();
 
-        sendMessageService.sendMessage(messageName, correlationKey, confirmationData);
-        logger.info("Bestätigung an das Abrechnungswesen gesendet: MessageName={}, CorrelationKey={}", messageName, correlationKey);
+        sendMessageService.sendMessage(messageName, employeeNumber, confirmationData);
+        emailSenderService.sendEmailAndPublishMessage(
+                "kodo2101@gmail",
+                "Dienstreiseantrag",
+                "Das Geld wurde an "+ employeeNumber+" gesendet.",
+                messageName,
+                employeeNumber
+                );
+        logger.info("Bestätigung an das Abrechnungswesen gesendet: MessageName={}, CorrelationKey={}", messageName, employeeNumber);
 
         // 4. Job abschließen
         client.newCompleteCommand(job.getKey()).send().join();
