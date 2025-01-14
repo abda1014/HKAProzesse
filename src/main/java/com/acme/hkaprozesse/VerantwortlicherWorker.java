@@ -11,6 +11,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Worker-Klasse, die für das Benachrichtigen des Antragstellers zuständig ist, basierend auf der Entscheidung,
+ * die durch das DMN-Modell (Entscheidungsmodell und Notation) im Camunda-Workflow getroffen wurde.
+ * Sie sendet entweder eine Genehmigungs- oder Ablehnungsbenachrichtigung an den Antragsteller.
+ */
 @Component
 public class VerantwortlicherWorker {
 
@@ -18,12 +23,25 @@ public class VerantwortlicherWorker {
     private final SendMessageService sendMessageService;
     private final EmailSenderService emailSenderService;
 
-    // Konstruktor für Dependency Injection des SendMessageService
+    /**
+     * Konstruktor für die Dependency Injection der benötigten Services.
+     *
+     * @param sendMessageService der Service, der für das Senden von Nachrichten zuständig ist
+     * @param emailSenderService der Service, der für das Senden von E-Mails zuständig ist
+     */
     public VerantwortlicherWorker(SendMessageService sendMessageService, EmailSenderService emailSenderService) {
         this.sendMessageService = sendMessageService;
         this.emailSenderService = emailSenderService;
     }
 
+    /**
+     * Verarbeitet den Job "antrag-benachrichtigen", der dafür zuständig ist, den Antragsteller
+     * über die Entscheidung zu informieren, basierend auf dem DMN-Entscheidungsergebnis.
+     * Es wird eine Genehmigungs- oder Ablehnungsnachricht per E-Mail gesendet.
+     *
+     * @param client der JobClient, der den Job verwaltet
+     * @param job    der aktivierte Job, der bearbeitet wird
+     */
     @JobWorker(type = "antrag-benachrichtigen")
     public void handleAntragBenachrichtigung(final JobClient client, final ActivatedJob job) {
         logger.info("Start: Antragsteller benachrichtigen");
@@ -37,20 +55,18 @@ public class VerantwortlicherWorker {
             Boolean decisionResult = (Boolean) variables.get("eligibleTravel"); // Genehmigt oder Abgelehnt
             String employeeNumber = (String) variables.get("employeeNumber"); // Korrelationsschlüssel
 
-            String applicantEmail= employeeNumber+"@gmail.com";
+            String applicantEmail = employeeNumber + "@gmail.com";
 
             logger.info("Entscheidung aus DMN: {}, EmployeeNumber: {}", decisionResult, employeeNumber);
 
             // Nachricht basierend auf Entscheidung senden
             if (Boolean.TRUE.equals(decisionResult)) {
                 logger.info("Antrag genehmigt. Nachricht wird gesendet...");
-//                sendMessageService.sendMessage("AntragGenehmigt", employeeNumber, "Ihr Antrag wurde genehmigt.");
-                emailSenderService.sendEmailAndPublishMessage(applicantEmail,"Dienstreiseantrag","Der Antrag wurde genehmigt","AntragGenehmigt",employeeNumber);
+                emailSenderService.sendEmailAndPublishMessage(applicantEmail, "Dienstreiseantrag", "Der Antrag wurde genehmigt", "AntragGenehmigt", employeeNumber);
                 logger.info("Nachricht 'AntragGenehmigt' wurde erfolgreich gesendet.");
             } else if (Boolean.FALSE.equals(decisionResult)) {
                 logger.info("Antrag abgelehnt. Nachricht wird gesendet...");
-//                sendMessageService.sendMessage("AntragAbgelehnt", employeeNumber, "Ihr Antrag wurde abgelehnt.");
-                emailSenderService.sendEmailAndPublishMessage(applicantEmail,"Dienstreiseantrag","Ihr Antrag wurde abgelehnt","AntragAbgelehn",employeeNumber);
+                emailSenderService.sendEmailAndPublishMessage(applicantEmail, "Dienstreiseantrag", "Ihr Antrag wurde abgelehnt", "AntragAbgelehn", employeeNumber);
                 logger.info("Nachricht 'AntragAbgelehnt' wurde erfolgreich gesendet.");
             }
 

@@ -6,15 +6,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * Service-Klasse zum Abrufen der E-Mail-Adresse eines Benutzers in der Finanzabteilung
+ * mit der Funktion "Leitung (Finanzen)" aus einer externen API.
+ */
 @Service
 public class FinanceRoleService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Konstruktor, der die Instanz von RestTemplate injiziert.
+     *
+     * @param restTemplate die Instanz von RestTemplate, die für HTTP-Anfragen verwendet wird
+     */
     public FinanceRoleService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Holt die E-Mail-Adresse eines Benutzers in der Rolle "Finanz Abteilung" mit der Funktion
+     * "Leitung (Finanzen)" für einen gegebenen Prozess- und Benutzer-ID.
+     *
+     * @param processId die ID des Prozesses
+     * @param userId    die ID des Benutzers
+     * @return die E-Mail-Adresse des Benutzers in der Finanzabteilung
+     * @throws Exception wenn ein Fehler beim Abrufen oder Verarbeiten der E-Mail-Adresse auftritt
+     */
     public String getFinanceEmail(String processId, String userId) throws Exception {
         // URL des externen Backends mit Prozess-ID und User-ID
         String backendUrl = UriComponentsBuilder.fromHttpUrl("https://localhost:3000/rolemapper/process-roles")
@@ -33,6 +51,14 @@ public class FinanceRoleService {
         }
     }
 
+    /**
+     * Verarbeitet die JSON-Antwort und extrahiert die E-Mail-Adresse eines Benutzers in der Rolle
+     * "Finanz Abteilung" mit der Funktion "Leitung (Finanzen)".
+     *
+     * @param jsonResponse die JSON-Antwort des externen Backends
+     * @return die E-Mail-Adresse des Benutzers in der Finanzabteilung
+     * @throws Exception wenn ein Fehler beim Verarbeiten der Antwort auftritt
+     */
     private String extractFinanceEmail(String jsonResponse) throws Exception {
         // JSON mit Jackson verarbeiten
         ObjectMapper objectMapper = new ObjectMapper();
@@ -47,7 +73,7 @@ public class FinanceRoleService {
         // Suche nach der Rolle "Finanz Abteilung"
         JsonNode financeRoleNode = null;
         for (JsonNode roleNode : rolesNode) {
-            if ("Finanz Abteilung".equals(roleNode.path("roleName").asText())) {
+            if ("Finanabteilung".equals(roleNode.path("roleName").asText())) {
                 financeRoleNode = roleNode;
                 break;
             }
@@ -71,7 +97,7 @@ public class FinanceRoleService {
                     throw new Exception("Die 'userId' des Benutzers konnte nicht extrahiert werden.");
                 }
                 // E-Mail-Adresse zusammenstellen
-                return userId + "@gmail.com";
+                return userId + "@gmail.com"; // Beispiel-Domain hinzufügen
             }
         }
 
