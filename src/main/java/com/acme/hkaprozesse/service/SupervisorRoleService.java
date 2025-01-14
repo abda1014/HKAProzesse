@@ -7,22 +7,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * Service-Klasse zum Abrufen der E-Mail-Adresse eines Vorgesetzten aus einer externen API
+ * basierend auf einer gegebenen Prozess- und Benutzer-ID.
+ */
 @Service
 public class SupervisorRoleService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Konstruktor, der die Instanz von RestTemplate injiziert.
+     *
+     * @param restTemplate die Instanz von RestTemplate, die für HTTP-Anfragen verwendet wird
+     */
     public SupervisorRoleService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Holt die E-Mail-Adresse eines Vorgesetzten für einen gegebenen Prozess- und Benutzer-ID.
+     *
+     * @param processId die ID des Prozesses
+     * @param userId    die ID des Benutzers
+     * @return die E-Mail-Adresse des Vorgesetzten
+     * @throws Exception wenn ein Fehler beim Abrufen oder Verarbeiten der E-Mail-Adresse auftritt
+     */
     public String getSupervisor(String processId, String userId) throws Exception {
         // URL des externen Backends mit Prozess-ID und User-ID
         String backendUrl = UriComponentsBuilder.fromHttpUrl("https://localhost:3000/rolemapper/process-roles")
                 .queryParam("processId", processId)
                 .queryParam("userId", userId)
                 .toUriString();
-
 
         try {
             // REST-GET-Aufruf
@@ -35,6 +51,13 @@ public class SupervisorRoleService {
         }
     }
 
+    /**
+     * Verarbeitet die JSON-Antwort und extrahiert die E-Mail-Adresse des Vorgesetzten.
+     *
+     * @param jsonResponse die JSON-Antwort des externen Backends
+     * @return die E-Mail-Adresse des Vorgesetzten
+     * @throws Exception wenn ein Fehler beim Verarbeiten der Antwort auftritt
+     */
     private String extractSupervisorEmail(String jsonResponse) throws Exception {
         // JSON mit Jackson verarbeiten
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,7 +72,7 @@ public class SupervisorRoleService {
         // Suche nach der Rolle "Vorgesetzter"
         JsonNode supervisorNode = null;
         for (JsonNode roleNode : rolesNode) {
-            if ("Vorgesetzter".equals(roleNode.path("roleName").asText())) {
+            if ("Vorgesetzte:r".equals(roleNode.path("roleName").asText())) {
                 supervisorNode = roleNode;
                 break;
             }

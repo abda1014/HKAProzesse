@@ -6,16 +6,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
+/**
+ * Service-Klasse für das Abrufen und Verarbeiten von Rechnungsprüfungs-E-Mail-Adressen
+ * basierend auf Prozess- und Benutzer-IDs durch eine externe API.
+ */
 @Service
 public class AccountingRoleService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Konstruktor, der die RestTemplate-Instanz injiziert.
+     *
+     * @param restTemplate die Instanz von RestTemplate, die für HTTP-Anfragen verwendet wird
+     */
     public AccountingRoleService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Holt die E-Mail-Adresse des Benutzers, der in der Rolle "Rechnungsprüfung" für einen gegebenen
+     * Prozess und Benutzer-IDs eingetragen ist.
+     *
+     * @param processId die ID des Prozesses
+     * @param userId    die ID des Benutzers
+     * @return die E-Mail-Adresse des Benutzers in der Rolle "Rechnungsprüfung"
+     * @throws Exception wenn ein Fehler beim Abrufen oder Verarbeiten der E-Mail-Adresse auftritt
+     */
     public String getAccountingEmail(String processId, String userId) throws Exception {
         // URL des externen Backends mit Prozess-ID und User-ID
         String backendUrl = UriComponentsBuilder.fromHttpUrl("https://localhost:3000/rolemapper/process-roles")
@@ -34,6 +51,14 @@ public class AccountingRoleService {
         }
     }
 
+    /**
+     * Verarbeitet die JSON-Antwort und extrahiert die E-Mail-Adresse des Benutzers
+     * aus der Rolle "Rechnungsprüfung".
+     *
+     * @param jsonResponse die JSON-Antwort des externen Backends
+     * @return die E-Mail-Adresse des Benutzers in der Rolle "Rechnungsprüfung"
+     * @throws Exception wenn ein Fehler beim Verarbeiten der Antwort auftritt
+     */
     private String extractAccountingEmail(String jsonResponse) throws Exception {
         // JSON mit Jackson verarbeiten
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +73,7 @@ public class AccountingRoleService {
         // Suche nach der Rolle "Rechnungsprüfung"
         JsonNode accountingNode = null;
         for (JsonNode roleNode : rolesNode) {
-            if ("Rechnungsprüfung".equals(roleNode.path("roleName").asText())) {
+            if ("Rechnungsprüfer:in".equals(roleNode.path("roleName").asText())) {
                 accountingNode = roleNode;
                 break;
             }
@@ -73,6 +98,6 @@ public class AccountingRoleService {
         }
 
         // E-Mail-Adresse zusammenstellen
-        return userId + "@gmail.com"; // Beispiel-Domain hinzufügen
+        return userId + "@gmail.com";
     }
 }
