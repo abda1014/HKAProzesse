@@ -34,7 +34,7 @@ Das Projekt **HKAProzesse** implementiert einen Dienstreiseantragsprozess mithil
 
    ```bash
    cd hkaprozesse
-   ```bash
+
     //Starte die benötigten Docker-Container:
     docker-compose up
     //Baue das Projekt mit Maven und starte es:
