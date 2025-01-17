@@ -34,10 +34,13 @@ Das Projekt **HKAProzesse** implementiert einen Dienstreiseantragsprozess mithil
 
    ```bash
    cd hkaprozesse
-docker-compose up
-mvn spring-boot:run
+   //Starte die benötigten Docker-Container:
+   ```bash
+    docker-compose up
+    //Baue das Projekt mit Maven und starte es:
+    mvn spring-boot:run
 
-
-cd RoleMapper
-npm run dev
+    // Wechsle in das Verzeichnis des RoleMapper-Projekts und starte es:
+   cd RoleMapper
+   npm run dev
 
