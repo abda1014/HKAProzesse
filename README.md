@@ -23,9 +23,7 @@ Das Projekt **HKAProzesse** implementiert einen Dienstreiseantragsprozess mithil
   Stelle sicher, dass das Zertifikat (`certificat.crt`), das im Verzeichnis `.volumes/keys/` im RoleMapper-Projekt liegt, in den Truststore des Projekts aufgenommen wird.  
   Die Bedingung für die Rollenermittlung ist, dass das Zertifikat vom RoleMapper akzeptiert wird.
 
-### Zugangsdaten
-- **Lokale Cluster-Informationen**:  
-  Die Cluster-Details müssen in der `main()`-Methode und in der `application.yml` hinterlegt sein.
+
 
 ## Schritte zur Ausführung
 
